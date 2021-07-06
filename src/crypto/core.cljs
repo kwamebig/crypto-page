@@ -5,6 +5,7 @@
    [crypto.events :as events]
    [crypto.views :as views]
    [crypto.config :as config]
+   [clojure.core.async :refer [go-loop <! timeout]]
    ))
 
 
@@ -21,4 +22,8 @@
 (defn init []
   (re-frame/dispatch-sync [::events/initialize-db])
   (dev-setup)
-  (mount-root))
+  (mount-root)
+  (go-loop [seconds 0]
+        (<! (timeout 3000))
+        (re-frame/dispatch [:http-request])
+        (recur (+ seconds 3))))
